@@ -18,7 +18,6 @@ import java.nio.file.StandardOpenOption;
 import static java.nio.file.StandardOpenOption.READ;
 import static java.nio.file.StandardOpenOption.WRITE;
 import static org.junit.Assert.*;
-import static org.junit.Assert.assertFalse;
 
 /**
  * Test for {@link CipherChannel}.

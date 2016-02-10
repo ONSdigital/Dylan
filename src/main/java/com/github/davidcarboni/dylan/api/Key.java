@@ -19,6 +19,6 @@ public class Key {
     public String get(HttpServletRequest request, HttpServletResponse response) {
         String filename = Path.newInstance(request).lastSegment();
         PublicKey dummy = com.github.davidcarboni.cryptolite.Keys.newKeyPair().getPublic();
-        return KeyWrapper.encodePublicKey();
+        return KeyWrapper.encodePublicKey(dummy);
     }
 }

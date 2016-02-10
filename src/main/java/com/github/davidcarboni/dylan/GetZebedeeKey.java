@@ -2,7 +2,6 @@ package com.github.davidcarboni.dylan;
 
 import com.github.davidcarboni.cryptolite.KeyWrapper;
 import com.github.davidcarboni.cryptolite.Keys;
-import com.github.davidcarboni.dylan.Storage;
 import com.github.davidcarboni.restolino.framework.Startup;
 import org.apache.commons.io.FileUtils;
 

@@ -7,9 +7,11 @@ import org.apache.commons.lang3.StringUtils;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.security.PublicKey;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -19,11 +21,11 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  */
 public class Storage {
 
-    static final Path store = Paths.get( StringUtils.defaultIfBlank(System.getenv("dylan.storage"), "./target/dylan"));
+    static final Path store = Paths.get(StringUtils.defaultIfBlank(System.getenv("dylan.storage"), "./target/dylan"));
     static final Path keys = store.resolve("keys");
     static final Path files = store.resolve("files");
     static final Path senderKey = store.resolve("sender.pub");
-    public static final Path recipientKey = store.resolve("recipient.pub");
+    static final Path recipientKey = store.resolve("recipient.pub");
 
     static boolean initialised;
 
@@ -42,6 +44,13 @@ public class Storage {
             result = FileUtils.readFileToString(path.toFile(), UTF_8);
         }
         return result;
+    }
+
+    public static void saveKey(String name, String encryptedKey) throws IOException {
+        Path target = keys.resolve(name);
+        Path keyFile = Files.createTempFile(name, ".key");
+        FileUtils.writeStringToFile(keyFile.toFile(), encryptedKey, StandardCharsets.UTF_8);
+        Files.move(keyFile, target, StandardCopyOption.REPLACE_EXISTING);
     }
 
     public static InputStream getFile(String name) throws IOException {
