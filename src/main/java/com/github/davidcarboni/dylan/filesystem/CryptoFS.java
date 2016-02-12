@@ -1,20 +1,31 @@
 package com.github.davidcarboni.dylan.filesystem;
 
+import sun.nio.fs.UnixFileSystemProvider;
+
 import java.io.IOException;
 import java.nio.file.*;
 import java.nio.file.attribute.UserPrincipalLookupService;
 import java.nio.file.spi.FileSystemProvider;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * TODO: implement.
  */
 public class CryptoFS extends FileSystem {
 
-    static CryptoFS instance = new CryptoFS();
+    private static Map<FileSystem, CryptoFS> instances = new ConcurrentHashMap<>();
+    private FileSystem fileSystem;
 
-    public static CryptoFS getInstance() {
-        return instance;
+    public CryptoFS(FileSystem fileSystem) {
+        this.fileSystem = fileSystem;
+    }
+
+
+    public static FileSystem wrap(FileSystem fileSystem) {
+        instances.putIfAbsent(fileSystem, new CryptoFS(fileSystem));
+        return instances.get(fileSystem);
     }
 
     @Override
@@ -27,7 +38,7 @@ public class CryptoFS extends FileSystem {
      */
     @Override
     public void close() throws IOException {
-        CryptoFSProvider.fileSystem.close();
+        fileSystem.close();
     }
 
     /**
@@ -35,7 +46,7 @@ public class CryptoFS extends FileSystem {
      */
     @Override
     public boolean isOpen() {
-        return CryptoFSProvider.fileSystem.isOpen();
+        return fileSystem.isOpen();
     }
 
     /**
@@ -43,7 +54,7 @@ public class CryptoFS extends FileSystem {
      */
     @Override
     public boolean isReadOnly() {
-        return CryptoFSProvider.fileSystem.isReadOnly();
+        return fileSystem.isReadOnly();
     }
 
     /**
@@ -51,7 +62,7 @@ public class CryptoFS extends FileSystem {
      */
     @Override
     public String getSeparator() {
-        return CryptoFSProvider.fileSystem.getSeparator();
+        return fileSystem.getSeparator();
     }
 
     /**
@@ -61,7 +72,7 @@ public class CryptoFS extends FileSystem {
      */
     @Override
     public Iterable<Path> getRootDirectories() {
-        return CryptoFSProvider.fileSystem.getRootDirectories();
+        return fileSystem.getRootDirectories();
     }
 
     /**
@@ -71,7 +82,7 @@ public class CryptoFS extends FileSystem {
      */
     @Override
     public Iterable<FileStore> getFileStores() {
-        return CryptoFSProvider.fileSystem.getFileStores();
+        return fileSystem.getFileStores();
     }
 
     /**
@@ -81,7 +92,7 @@ public class CryptoFS extends FileSystem {
      */
     @Override
     public Set<String> supportedFileAttributeViews() {
-        return CryptoFSProvider.fileSystem.supportedFileAttributeViews();
+        return fileSystem.supportedFileAttributeViews();
     }
 
     /**
@@ -93,7 +104,7 @@ public class CryptoFS extends FileSystem {
      */
     @Override
     public Path getPath(String first, String... more) {
-        return null;
+        return null; // TODO
     }
 
     /**
@@ -104,7 +115,7 @@ public class CryptoFS extends FileSystem {
      */
     @Override
     public PathMatcher getPathMatcher(String syntaxAndPattern) {
-        return CryptoFSProvider.fileSystem.getPathMatcher(syntaxAndPattern);
+        return fileSystem.getPathMatcher(syntaxAndPattern);
     }
 
     /**
@@ -114,7 +125,7 @@ public class CryptoFS extends FileSystem {
      */
     @Override
     public UserPrincipalLookupService getUserPrincipalLookupService() {
-        return CryptoFSProvider.fileSystem.getUserPrincipalLookupService();
+        return fileSystem.getUserPrincipalLookupService();
     }
 
     /**
@@ -125,6 +136,6 @@ public class CryptoFS extends FileSystem {
      */
     @Override
     public WatchService newWatchService() throws IOException {
-        return CryptoFSProvider.fileSystem.newWatchService();
+        return fileSystem.newWatchService();
     }
 }

@@ -12,6 +12,6 @@ import java.nio.file.FileSystem;
 public class CryptoFSFactory implements FileSystemFactory {
     @Override
     public FileSystem createFileSystem(Session session) throws IOException {
-        return CryptoFS.getInstance();
+        return null; // TODO CryptoFS.getInstance();
     }
 }

@@ -1,5 +1,8 @@
 package com.github.davidcarboni.dylan.filesystem;
 
+import com.github.davidcarboni.cryptolite.Keys;
+
+import javax.crypto.SecretKey;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
@@ -16,6 +19,12 @@ public class CryptoPath implements Path {
     }
     private  CryptoPath() {
         // Use wrap();
+    }
+
+
+    public static SecretKey getKey(Path path) {
+        // TODO
+        return Keys.newSecretKey();
     }
 
     @Override
