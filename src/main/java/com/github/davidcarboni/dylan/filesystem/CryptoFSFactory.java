@@ -9,7 +9,7 @@ import java.net.URI;
 import java.nio.file.FileSystem;
 
 /**
- * Created by david on 12/02/16.
+ * {@link FileSystemFactory} implementation.
  */
 public class CryptoFSFactory implements FileSystemFactory {
     @Override
