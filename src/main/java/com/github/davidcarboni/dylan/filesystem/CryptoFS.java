@@ -55,7 +55,7 @@ public class CryptoFS extends FileSystem {
     }
 
     /**
-     * This is currently a simple pass-through to the underlying filesystem.
+     * This is currently a simple pass-through to the underlying {@link FileSystem}.
      *
      * @return The result of calling this method on {@link CryptoFSProvider#fileSystem}.
      */
@@ -65,7 +65,7 @@ public class CryptoFS extends FileSystem {
     }
 
     /**
-     * This is currently a simple pass-through to the underlying filesystem.
+     * This is currently a simple pass-through to the underlying {@link FileSystem}.
      *
      * @return The result of calling this method on {@link CryptoFSProvider#fileSystem}.
      */
@@ -75,7 +75,7 @@ public class CryptoFS extends FileSystem {
     }
 
     /**
-     * This is currently a simple pass-through to the underlying filesystem.
+     * This is currently a simple pass-through to the underlying {@link FileSystem}.
      *
      * @return The result of calling this method on {@link CryptoFSProvider#fileSystem}.
      */
@@ -87,9 +87,9 @@ public class CryptoFS extends FileSystem {
     /**
      * TODO
      *
-     * @param first
-     * @param more
-     * @return
+     * @param first Coming soon..
+     * @param more Coming soon..
+     * @return A {@link CryptoPath}.
      */
     @Override
     public Path getPath(String first, String... more) {
@@ -97,7 +97,7 @@ public class CryptoFS extends FileSystem {
     }
 
     /**
-     * This is currently a simple pass-through to the underlying filesystem.
+     * This is currently a simple pass-through to the underlying {@link FileSystem}.
      *
      * @param syntaxAndPattern Passed to the underlying {@link FileSystem}.
      * @return The result of calling this method on {@link CryptoFSProvider#fileSystem}.
@@ -108,7 +108,7 @@ public class CryptoFS extends FileSystem {
     }
 
     /**
-     * This is currently a simple pass-through to the underlying filesystem.
+     * This is currently a simple pass-through to the underlying {@link FileSystem}.
      *
      * @return The result of calling this method on {@link CryptoFSProvider#fileSystem}.
      */
@@ -118,7 +118,7 @@ public class CryptoFS extends FileSystem {
     }
 
     /**
-     * This is currently a simple pass-through to the underlying filesystem.
+     * This is currently a simple pass-through to the underlying {@link FileSystem}.
      *
      * @return The result of calling this method on {@link CryptoFSProvider#fileSystem}.
      * @throws IOException If the underlying {@link FileSystem} throws an exception.
