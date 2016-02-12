@@ -1,5 +1,7 @@
 package com.github.davidcarboni.dylan.filesystem;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.io.IOException;
 import java.net.URI;
 import java.nio.channels.SeekableByteChannel;
@@ -15,24 +17,36 @@ import java.util.Set;
  * TODO: implement.
  */
 public class CryptoFSProvider extends FileSystemProvider {
+
+    static Path root = Paths.get("/");
+    static FileSystem fileSystem = CryptoFSProvider.root.getFileSystem();
+    static FileSystemProvider fileSystemProvider = fileSystem.provider();
+    static CryptoFSProvider instance = new CryptoFSProvider();
+
+    public static CryptoFSProvider getInstance() {
+        return instance;
+    }
+
     @Override
     public String getScheme() {
-        return null;
+        return "enc:" + fileSystemProvider.getScheme();
     }
 
     @Override
     public FileSystem newFileSystem(URI uri, Map<String, ?> env) throws IOException {
-        return null;
+        return CryptoFS.getInstance();
     }
 
     @Override
     public FileSystem getFileSystem(URI uri) {
-        return null;
+        return CryptoFS.getInstance();
     }
 
     @Override
     public Path getPath(URI uri) {
-        return null;
+        String uriPath = uri.getPath();
+        Path path = Paths.get(uriPath);
+        return CryptoPath.wrap(path);
     }
 
     @Override

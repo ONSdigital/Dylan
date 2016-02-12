@@ -10,6 +10,14 @@ import java.util.Iterator;
  * TODO: implement.
  */
 public class CryptoPath implements Path {
+
+    static Path wrap(Path path) {
+        return null;
+    }
+    private  CryptoPath() {
+        // Use wrap();
+    }
+
     @Override
     public FileSystem getFileSystem() {
         return null;
