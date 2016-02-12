@@ -1,7 +1,5 @@
 # Dylan
 
-Transactional file publishing tool over HTTP, name inspired by The Train from The Magic Roundabout.
-
 Runs an scp server that accepts files and stores them encrypted, using a public key.
 
 ## Basics
