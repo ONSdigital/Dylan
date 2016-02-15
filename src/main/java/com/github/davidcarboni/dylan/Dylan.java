@@ -12,9 +12,9 @@ import java.security.PublicKey;
 public class Dylan {
 
       public static void storeKey(String name, SecretKey key) throws IOException {
-          PublicKey recipientKey = Storage.getRecipientKey();
+          PublicKey recipientKey = Store.getRecipientKey();
           KeyExchange keyExchange = new KeyExchange();
           String encryptedKey = keyExchange.encryptKey(key, recipientKey);
-          //Storage.saveKey(encryptedKey);
+          Store.saveKey(name, encryptedKey);
       }
 }

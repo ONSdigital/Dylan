@@ -167,7 +167,11 @@ public class CipherChannelTest {
         assertFalse(read.isOpen());
     }
 
+<<<<<<< Updated upstream
     @Test(expected = UnsupportedOperationException.class)
+=======
+    @Test (expected = UnsupportedOperationException.class)
+>>>>>>> Stashed changes
     public void shouldNotSeek() throws IOException {
 
         // Given

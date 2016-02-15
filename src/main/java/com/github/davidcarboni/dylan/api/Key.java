@@ -1,13 +1,13 @@
 package com.github.davidcarboni.dylan.api;
 
-import com.github.davidcarboni.cryptolite.KeyWrapper;
+import com.github.davidcarboni.dylan.Store;
 import com.github.davidcarboni.restolino.framework.Api;
-import com.github.davidcarboni.restolino.helpers.Path;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.GET;
-import java.security.PublicKey;
+import javax.ws.rs.core.Response;
+import java.io.IOException;
 
 /**
  * Gets an encrypted key.
@@ -15,10 +15,17 @@ import java.security.PublicKey;
 @Api
 public class Key {
 
-    @GET
-    public String get(HttpServletRequest request, HttpServletResponse response) {
-        String filename = Path.newInstance(request).lastSegment();
-        PublicKey dummy = com.github.davidcarboni.cryptolite.Keys.newKeyPair().getPublic();
-        return KeyWrapper.encodePublicKey(dummy);
-    }
+	@GET
+	public String get(HttpServletRequest request, HttpServletResponse response) throws IOException {
+
+		String name = request.getParameter("name");
+		String key = Store.getKey(name);
+
+		if (key == null) {
+			response.setStatus(Response.Status.NOT_FOUND.getStatusCode());
+			return null;
+		} else {
+			return key;
+		}
+	}
 }

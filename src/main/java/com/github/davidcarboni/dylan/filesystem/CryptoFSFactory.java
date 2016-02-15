@@ -1,14 +1,14 @@
 package com.github.davidcarboni.dylan.filesystem;
 
-import com.sun.jndi.toolkit.url.Uri;
 import org.apache.sshd.common.file.FileSystemFactory;
 import org.apache.sshd.common.session.Session;
 
 import java.io.IOException;
 import java.net.URI;
-import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
+
+import static com.github.davidcarboni.dylan.Configuration.CSDB.getCsdbDataDir;
 
 /**
  * {@link FileSystemFactory} implementation.
@@ -24,10 +24,12 @@ public class CryptoFSFactory implements FileSystemFactory {
     public static void main(String[] args) throws IOException {
         CryptoFSFactory cryptoFSFactory = new CryptoFSFactory();
         CryptoFS fileSystem = cryptoFSFactory.createFileSystem(null);
-        Path path = fileSystem.getPath("/home/david");
+        //Path path = fileSystem.getPath("/home/david");
+        Path path = fileSystem.getPath("/Users/dave/Desktop");
         URI uri = path.toUri();
         System.out.println("uri = " + uri);
-        Path path2 = fileSystem.getPath("/home/david");
+       // Path path2 = fileSystem.getPath("/home/david");
+        Path path2 = fileSystem.getPath(getCsdbDataDir());
         URI uri2 = path2.toUri();
         System.out.println("uri = " + uri2);
     }
