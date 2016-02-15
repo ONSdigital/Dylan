@@ -2,6 +2,7 @@ package com.github.davidcarboni.dylan.filesystem;
 
 import org.apache.commons.lang3.StringUtils;
 
+import javax.crypto.SecretKey;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.channels.SeekableByteChannel;
@@ -18,22 +19,27 @@ import java.util.Set;
  */
 public class CryptoFSProvider extends FileSystemProvider {
 
+    public static String SCHEME = "crypto";
     static Path root = Paths.get("/");
     static FileSystem fileSystem = CryptoFSProvider.root.getFileSystem();
     static FileSystemProvider fileSystemProvider = fileSystem.provider();
-    static CryptoFSProvider instance = new CryptoFSProvider();
+    static CryptoFSProvider instance;
 
-    public static CryptoFSProvider getInstance() {
-        return instance;
+    public CryptoFSProvider() {
+        if (instance != null)
+            System.out.println("Warning, more than one instatiation detected for " + this.getClass().getSimpleName());
+        instance = this;
+        System.out.println("Initialised " + this.getClass().getSimpleName());
     }
 
     @Override
     public String getScheme() {
-        return "enc:" + fileSystemProvider.getScheme();
+        return SCHEME;
     }
 
     /**
      * Calls the underlying {@link FileSystemProvider} and passes the result to {@link CryptoFS#wrap(FileSystem)}
+     *
      * @param uri Passed through.
      * @param env Passed through.
      * @return {@link CryptoFS#wrap(FileSystem)}
@@ -45,41 +51,45 @@ public class CryptoFSProvider extends FileSystemProvider {
     }
 
     /**
-     *
      * @param uri Passed through.
      * @return {@link CryptoFS#wrap(FileSystem)}.
      */
     @Override
     public FileSystem getFileSystem(URI uri) {
-        return CryptoFS.wrap(fileSystemProvider.getFileSystem(uri));
+        return CryptoFS.wrap(fileSystemProvider.getFileSystem(URI.create("file:///")));
     }
 
     /**
      * TODO
+     *
      * @param uri Passed through.
      * @return Passed through.
      */
     @Override
     public Path getPath(URI uri) {
-        return CryptoPath.wrap(fileSystemProvider.getPath(uri));
+        return CryptoPath.wrap(fileSystemProvider.getPath(uri),CryptoFS.wrap(fileSystem));
     }
 
     /**
      * TODO
-     * @param path Passed through.
+     *
+     * @param path    Passed through.
      * @param options Passed through.
-     * @param attrs Passed through.
+     * @param attrs   Passed through.
      * @return Passed through.
      * @throws IOException Passed through.
      */
     @Override
     public SeekableByteChannel newByteChannel(Path path, Set<? extends OpenOption> options, FileAttribute<?>... attrs) throws IOException {
-        return CipherChannel.wrap(fileSystemProvider.newByteChannel(path, options, attrs), CryptoPath.getKey(path));
+        SecretKey key = CryptoPath.getKey(path);
+        SeekableByteChannel channel = fileSystemProvider.newByteChannel(CryptoPath.unwrap(path),options,attrs);
+        return CipherChannel.wrap(channel, key);
     }
 
     /**
      * This is currently a simple pass-through to the underlying {@link FileSystemProvider}.
-     * @param dir Passed through.
+     *
+     * @param dir    Passed through.
      * @param filter Passed through.
      * @return Passed through.
      * @throws IOException Passed through.
@@ -91,7 +101,8 @@ public class CryptoFSProvider extends FileSystemProvider {
 
     /**
      * This is currently a simple pass-through to the underlying {@link FileSystemProvider}.
-     * @param dir Passed through.
+     *
+     * @param dir   Passed through.
      * @param attrs Passed through.
      * @throws IOException Passed through.
      */
@@ -102,6 +113,7 @@ public class CryptoFSProvider extends FileSystemProvider {
 
     /**
      * This is currently a simple pass-through to the underlying {@link FileSystemProvider}.
+     *
      * @param path Passed through.
      * @throws IOException Passed through.
      */
@@ -112,8 +124,9 @@ public class CryptoFSProvider extends FileSystemProvider {
 
     /**
      * This is currently a simple pass-through to the underlying {@link FileSystemProvider}.
-     * @param source Passed through.
-     * @param target Passed through.
+     *
+     * @param source  Passed through.
+     * @param target  Passed through.
      * @param options Passed through.
      * @throws IOException Passed through.
      */
@@ -124,8 +137,9 @@ public class CryptoFSProvider extends FileSystemProvider {
 
     /**
      * This is currently a simple pass-through to the underlying {@link FileSystemProvider}.
-     * @param source Passed through.
-     * @param target Passed through.
+     *
+     * @param source  Passed through.
+     * @param target  Passed through.
      * @param options Passed through.
      * @throws IOException Passed through.
      */
@@ -136,7 +150,8 @@ public class CryptoFSProvider extends FileSystemProvider {
 
     /**
      * This is currently a simple pass-through to the underlying {@link FileSystemProvider}.
-     * @param path Passed through.
+     *
+     * @param path  Passed through.
      * @param path2 Passed through.
      * @return Passed through.
      * @throws IOException
@@ -148,6 +163,7 @@ public class CryptoFSProvider extends FileSystemProvider {
 
     /**
      * This is currently a simple pass-through to the underlying {@link FileSystemProvider}.
+     *
      * @param path Passed through.
      * @return Passed through.
      * @throws IOException Passed through.
@@ -159,6 +175,7 @@ public class CryptoFSProvider extends FileSystemProvider {
 
     /**
      * This is currently a simple pass-through to the underlying {@link FileSystemProvider}.
+     *
      * @param path Passed through.
      * @return Passed through.
      * @throws IOException Passed through.
@@ -169,8 +186,9 @@ public class CryptoFSProvider extends FileSystemProvider {
     }
 
     /**
-     *  This is currently a simple pass-through to the underlying {@link FileSystemProvider}.
-     * @param path Passed through.
+     * This is currently a simple pass-through to the underlying {@link FileSystemProvider}.
+     *
+     * @param path  Passed through.
      * @param modes Passed through.
      * @throws IOException Passed through.
      */
@@ -180,11 +198,12 @@ public class CryptoFSProvider extends FileSystemProvider {
     }
 
     /**
-     *  This is currently a simple pass-through to the underlying {@link FileSystemProvider}.
-     * @param path Passed through.
-     * @param type Passed through.
+     * This is currently a simple pass-through to the underlying {@link FileSystemProvider}.
+     *
+     * @param path    Passed through.
+     * @param type    Passed through.
      * @param options Passed through.
-     * @param <V> Passed through.
+     * @param <V>     Passed through.
      * @return Passed through.
      */
     @Override
@@ -193,11 +212,12 @@ public class CryptoFSProvider extends FileSystemProvider {
     }
 
     /**
-     *  This is currently a simple pass-through to the underlying {@link FileSystemProvider}.
-     * @param path Passed through.
-     * @param type Passed through.
+     * This is currently a simple pass-through to the underlying {@link FileSystemProvider}.
+     *
+     * @param path    Passed through.
+     * @param type    Passed through.
      * @param options Passed through.
-     * @param <A> Passed through.
+     * @param <A>     Passed through.
      * @return Passed through.
      * @throws IOException Passed through.
      */
@@ -207,10 +227,11 @@ public class CryptoFSProvider extends FileSystemProvider {
     }
 
     /**
-     *  This is currently a simple pass-through to the underlying {@link FileSystemProvider}.
-     * @param path Passed through.
+     * This is currently a simple pass-through to the underlying {@link FileSystemProvider}.
+     *
+     * @param path       Passed through.
      * @param attributes Passed through.
-     * @param options Passed through.
+     * @param options    Passed through.
      * @return Passed through.
      * @throws IOException Passed through.
      */
@@ -221,10 +242,11 @@ public class CryptoFSProvider extends FileSystemProvider {
 
     /**
      * This is currently a simple pass-through to the underlying {@link FileSystemProvider}.
-     * @param path Passed through.
-     * @param attribute  Passed through.
-     * @param value  Passed through.
-     * @param options  Passed through.
+     *
+     * @param path      Passed through.
+     * @param attribute Passed through.
+     * @param value     Passed through.
+     * @param options   Passed through.
      * @throws IOException Passed through.
      */
     @Override

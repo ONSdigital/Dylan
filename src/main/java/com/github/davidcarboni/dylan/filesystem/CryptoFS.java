@@ -23,14 +23,15 @@ public class CryptoFS extends FileSystem {
     }
 
 
-    public static FileSystem wrap(FileSystem fileSystem) {
-        instances.putIfAbsent(fileSystem, new CryptoFS(fileSystem));
+    public static CryptoFS wrap(FileSystem fileSystem) {
+        if (!instances.containsKey(fileSystem))
+            instances.putIfAbsent(fileSystem, new CryptoFS(fileSystem));
         return instances.get(fileSystem);
     }
 
     @Override
     public FileSystemProvider provider() {
-        return CryptoFSProvider.getInstance();
+        return CryptoFSProvider.instance;
     }
 
     /**
@@ -99,12 +100,12 @@ public class CryptoFS extends FileSystem {
      * TODO
      *
      * @param first Coming soon..
-     * @param more Coming soon..
+     * @param more  Coming soon..
      * @return A {@link CryptoPath}.
      */
     @Override
     public Path getPath(String first, String... more) {
-        return null; // TODO
+        return CryptoPath.wrap(Paths.get(first, more), this);
     }
 
     /**

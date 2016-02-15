@@ -15,6 +15,6 @@ public class Dylan {
           PublicKey recipientKey = Storage.getRecipientKey();
           KeyExchange keyExchange = new KeyExchange();
           String encryptedKey = keyExchange.encryptKey(key, recipientKey);
-          Storage.saveKey(encryptedKey);
+          //Storage.saveKey(encryptedKey);
       }
 }
