@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
+import java.nio.file.ProviderNotFoundException;
 
 import static com.github.davidcarboni.dylan.Configuration.CSDB.getCsdbDataDir;
 
@@ -18,7 +19,12 @@ public class CryptoFSFactory implements FileSystemFactory {
     public CryptoFS createFileSystem(Session session) throws IOException {
         URI uri = URI.create(CryptoFSProvider.SCHEME+":///");
         System.out.println("uri = " + uri);
-        return (CryptoFS)FileSystems.getFileSystem(uri);
+        try {
+            return (CryptoFS) FileSystems.getFileSystem(uri);
+        } catch (ProviderNotFoundException e) {
+            e.printStackTrace();
+            throw e;
+        }
     }
 
     public static void main(String[] args) throws IOException {
