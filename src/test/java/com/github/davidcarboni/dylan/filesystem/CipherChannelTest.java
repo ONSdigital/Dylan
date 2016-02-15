@@ -167,7 +167,7 @@ public class CipherChannelTest {
         assertFalse(read.isOpen());
     }
 
-    @Test
+    @Test(expected = UnsupportedOperationException.class)
     public void shouldNotSeek() throws IOException {
 
         // Given
