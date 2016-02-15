@@ -1,0 +1,24 @@
+# Eclipse
+.classpath
+.project
+.settings/
+
+# Intellij
+.idea/
+*.iml
+*.iws
+
+# Mac
+.DS_Store
+
+# Maven
+log/
+target/
+
+
+# NPM
+.sass-cache/
+node_modules
+src/main/web/florece/js/npm-debug.log
+npm-debug.log
+
