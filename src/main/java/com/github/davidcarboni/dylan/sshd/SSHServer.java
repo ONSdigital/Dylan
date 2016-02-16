@@ -1,8 +1,7 @@
 package com.github.davidcarboni.dylan.sshd;
 
 import com.github.davidcarboni.dylan.Configuration;
-import com.github.davidcarboni.dylan.filesystem.CryptoFSFactory;
-import org.apache.sshd.common.file.FileSystemFactory;
+import org.apache.sshd.common.file.virtualfs.VirtualFileSystemFactory;
 import org.apache.sshd.common.scp.ScpTransferEventListener;
 import org.apache.sshd.common.session.Session;
 import org.apache.sshd.server.SshServer;
@@ -41,21 +40,16 @@ public class SSHServer {
 	}
 
 	public void start() throws IOException {
-		//final VirtualFileSystemFactory virtualFileSystemFactory = new VirtualFileSystemFactory(scpRootDir);
-
-		final FileSystemFactory cryptoFileSystemFactory = new CryptoFSFactory();
+		final VirtualFileSystemFactory virtualFileSystemFactory = new VirtualFileSystemFactory(scpRootDir);
 
 		sshd = SshServer.setUpDefaultServer();
 		sshd.setPort(Configuration.SSH.getSSHPort());
 		sshd.setKeyPairProvider(new SimpleGeneratorHostKeyProvider());
 
-/*		sshd.setFileSystemFactory((Session session) -> {
+		sshd.setFileSystemFactory((Session session) -> {
 			vfs = virtualFileSystemFactory.createFileSystem(session);
 			return vfs;
-		});*/
-
-
-		sshd.setFileSystemFactory((Session session) -> cryptoFileSystemFactory.createFileSystem(session));
+		});
 
 		sshd.setPublickeyAuthenticator((String s, PublicKey publicKey, ServerSession serverSession) ->
 				publicKeyAuthenticator != null && publicKey instanceof RSAPublicKey && publicKeyAuthenticator.isValid(s, publicKey)

@@ -17,19 +17,14 @@ public class CSDBImport implements Startup {
 
 	private Consumer<Path> setScpFileReceivedHandler = (Path path) -> {
 		System.out.println("Received zip file: " + path.toString());
-		//CryptoFS cryptoFS =  CryptoFS.getInstance();
-
-		//String p = Configuration.CSDB.getCsdbDataDir();
 		File csdbFile = new File(Store.files.toString());
 
 		if (!csdbFile.exists() && !csdbFile.mkdirs()) {
 			throw new RuntimeException("csdb path not found");
 		}
 
-		//Path csdbPath = FileSystems.getDefault().getPath(csdbFile.getPath());
-		Path csdbPath = FileSystems.getDefault().getPath(csdbFile.getPath());
-
 		try {
+			Path csdbPath = FileSystems.getDefault().getPath(csdbFile.getPath());
 			byte bytes[] = Files.readAllBytes(FileSystems.getDefault().getPath(Configuration.SCP.getRootDir() + path.toString()));
 			ZipInputStream zis = new ZipInputStream(new ByteArrayInputStream(bytes));
 			ZipEntry entry;
@@ -52,7 +47,6 @@ public class CSDBImport implements Startup {
 	public void init() {
 		try {
 			new SSHServer(setScpFileReceivedHandler).start();
-			;
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
