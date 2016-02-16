@@ -1,7 +1,5 @@
 package com.github.davidcarboni.dylan.filesystem;
 
-import org.apache.commons.lang3.StringUtils;
-
 import javax.crypto.SecretKey;
 import java.io.IOException;
 import java.net.URI;
@@ -96,7 +94,7 @@ public class CryptoFSProvider extends FileSystemProvider {
      */
     @Override
     public DirectoryStream<Path> newDirectoryStream(Path dir, DirectoryStream.Filter<? super Path> filter) throws IOException {
-        return fileSystemProvider.newDirectoryStream(dir, filter);
+        return fileSystemProvider.newDirectoryStream(CryptoPath.unwrap(dir), filter);
     }
 
     /**
@@ -108,7 +106,7 @@ public class CryptoFSProvider extends FileSystemProvider {
      */
     @Override
     public void createDirectory(Path dir, FileAttribute<?>... attrs) throws IOException {
-        fileSystemProvider.createDirectory(dir, attrs);
+        fileSystemProvider.createDirectory(CryptoPath.unwrap(dir), attrs);
     }
 
     /**
@@ -119,7 +117,7 @@ public class CryptoFSProvider extends FileSystemProvider {
      */
     @Override
     public void delete(Path path) throws IOException {
-        fileSystemProvider.delete(path);
+        fileSystemProvider.delete(CryptoPath.unwrap(path));
     }
 
     /**
@@ -194,7 +192,7 @@ public class CryptoFSProvider extends FileSystemProvider {
      */
     @Override
     public void checkAccess(Path path, AccessMode... modes) throws IOException {
-        fileSystemProvider.checkAccess(path, modes);
+        fileSystemProvider.checkAccess(CryptoPath.unwrap(path), modes);
     }
 
     /**
@@ -208,7 +206,7 @@ public class CryptoFSProvider extends FileSystemProvider {
      */
     @Override
     public <V extends FileAttributeView> V getFileAttributeView(Path path, Class<V> type, LinkOption... options) {
-        return fileSystemProvider.getFileAttributeView(path, type, options);
+        return fileSystemProvider.getFileAttributeView(CryptoPath.unwrap(path), type, options);
     }
 
     /**
@@ -223,7 +221,7 @@ public class CryptoFSProvider extends FileSystemProvider {
      */
     @Override
     public <A extends BasicFileAttributes> A readAttributes(Path path, Class<A> type, LinkOption... options) throws IOException {
-        return fileSystemProvider.readAttributes(path, type, options);
+        return fileSystemProvider.readAttributes(CryptoPath.unwrap(path), type, options);
     }
 
     /**
@@ -237,7 +235,7 @@ public class CryptoFSProvider extends FileSystemProvider {
      */
     @Override
     public Map<String, Object> readAttributes(Path path, String attributes, LinkOption... options) throws IOException {
-        return fileSystemProvider.readAttributes(path, attributes, options);
+        return fileSystemProvider.readAttributes(CryptoPath.unwrap(path), attributes, options);
     }
 
     /**
@@ -251,6 +249,6 @@ public class CryptoFSProvider extends FileSystemProvider {
      */
     @Override
     public void setAttribute(Path path, String attribute, Object value, LinkOption... options) throws IOException {
-        fileSystemProvider.setAttribute(path, attribute, value, options);
+        fileSystemProvider.setAttribute(CryptoPath.unwrap(path), attribute, value, options);
     }
 }
