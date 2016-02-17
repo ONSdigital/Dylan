@@ -69,7 +69,6 @@ public class SSHServer {
 					return;
 				}
 				scpFileReceivedHandler.accept(path);
-				System.out.println("Call to Notifier: -> ");
 			}
 
 			@Override

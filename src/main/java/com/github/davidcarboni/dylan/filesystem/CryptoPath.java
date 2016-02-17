@@ -31,7 +31,7 @@ public class CryptoPath implements Path {
         return new CryptoPath(path, filesystem);
     }
 
-    static Path unwrap(Path path) {
+    public static Path unwrap(Path path) {
         String ssp = path.toUri().getSchemeSpecificPart();
         return Paths.get(ssp);
     }

@@ -25,7 +25,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 public class Store {
 
 	static final Path store = Paths.get(StringUtils.defaultIfBlank(System.getenv("dylan.storage"), "./target/dylan"));
-	static final Path keys = store.resolve("keys");
+	public static final Path keys = store.resolve("keys");
 	public static final Path files = store.resolve("files");
 	static final Path senderKey = store.resolve("sender.pub");
 	static final Path recipientKey = store.resolve("recipient.pub");

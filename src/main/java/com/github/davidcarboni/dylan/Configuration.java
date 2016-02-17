@@ -11,6 +11,8 @@ public class Configuration {
 
 	public static final Host RECIPIENT_HOST = new Host(ZEBEDEE_HOST_STR);
 
+	public static final String RECIPIENT_NOTIFY_PATH = "csdbnotify";
+
 	public static Endpoint getEndpoint(Host host, String path) {
 		return new Endpoint(host, path);
 	}

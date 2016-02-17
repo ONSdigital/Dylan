@@ -3,8 +3,10 @@ package com.github.davidcarboni.dylan;
 import com.github.davidcarboni.cryptolite.KeyExchange;
 import com.github.davidcarboni.dylan.filesystem.CryptoFS;
 import com.github.davidcarboni.dylan.filesystem.CryptoPath;
+import com.github.davidcarboni.dylan.notify.Notifier;
 import com.github.davidcarboni.dylan.sshd.SSHServer;
 import com.github.davidcarboni.restolino.framework.Startup;
+import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -12,21 +14,17 @@ import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+
 public class CSDBImport implements Startup {
 
 	private FileSystem cryptoFileSystem = FileSystems.getFileSystem(CryptoFS.uri());
-	private FileSystem defaultFileSystem = FileSystems.getDefault();
-
-	// Encrypt example.
-	//new Crypto().decrypt(Files.newInputStream(path), CryptoPath.getKey(path)
-
 
 	private Consumer<Path> setScpFileReceivedHandler = (Path path) -> {
-		System.out.println("Received zip file: " + path.toString());
 		File csdbFile = new File(Store.files.toString());
 
 		if (!csdbFile.exists() && !csdbFile.mkdirs()) {
@@ -43,18 +41,38 @@ public class CSDBImport implements Startup {
 				System.out.println("Received CSDB file: " + entry.getName());
 
 				if (!entry.isDirectory()) {
-					Path dest = csdbPath.resolve(entry.getName());
+					Path dest = resolveFile(csdbPath, entry.getName());
+
 					Files.copy(zis, dest);
-					System.out.println("CSDB file encrypted written to: " + dest.toString());
 
 					String encryptedKey = new KeyExchange().encryptKey(CryptoPath.getKey(dest), Store.getRecipientKey());
-					Store.saveKey(entry.getName(), encryptedKey);
+					Store.saveKey(keyName(dest), encryptedKey);
+
+					Notifier.notify(dest);
 				}
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
+			throw new RuntimeException(e);
+		} finally {
+			try {
+				// TODO is this necessary? Should this be kept/moved/archived?
+				Files.delete(path);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 	};
+
+	private Path resolveFile(Path path, String name) {
+		// TODO REMOVE the UUID from the name - this is for local dev only. Allows us to upload the same file multiple times.
+		return path.resolve(String.format("%s-%s.%s", FilenameUtils.getBaseName(name), UUID.randomUUID(),
+				FilenameUtils.getExtension(name)));
+	}
+
+	private String keyName(Path p) {
+		return String.format("%s.%s", FilenameUtils.getBaseName(CryptoPath.unwrap(p).getFileName().toString()), "key");
+	}
 
 	@Override
 	public void init() {
