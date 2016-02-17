@@ -2,6 +2,8 @@ package com.github.davidcarboni.dylan.filesystem;
 
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.file.*;
 import java.nio.file.attribute.UserPrincipalLookupService;
 import java.nio.file.spi.FileSystemProvider;
@@ -16,6 +18,16 @@ public class CryptoFS extends FileSystem {
 
     private static Map<FileSystem, CryptoFS> instances = new ConcurrentHashMap<>();
     private FileSystem fileSystem;
+
+    public static URI uri() {
+        try {
+            return new URI(CryptoFSProvider.SCHEME+":///");
+        } catch (URISyntaxException e) {
+            // TODO fix this.
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+    }
 
     public CryptoFS(FileSystem fileSystem) {
         this.fileSystem = fileSystem;

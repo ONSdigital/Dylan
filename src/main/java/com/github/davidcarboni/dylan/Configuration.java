@@ -48,6 +48,10 @@ public class Configuration {
 		public static String getCsdbDataDir() {
 			return get(CSDB_DATA_DIR_ENV, System.getProperty("user.dir") + "/target/files");
 		}
+
+		public static String getCsdbKeyDir() {
+			return get(CSDB_DATA_DIR_ENV, System.getProperty("user.dir") + "/target/keys");
+		}
 	}
 
 	/**

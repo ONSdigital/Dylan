@@ -1,11 +1,14 @@
 package com.github.davidcarboni.dylan;
 
+import com.github.davidcarboni.cryptolite.KeyExchange;
+import com.github.davidcarboni.dylan.filesystem.CryptoFS;
+import com.github.davidcarboni.dylan.filesystem.CryptoPath;
 import com.github.davidcarboni.dylan.sshd.SSHServer;
 import com.github.davidcarboni.restolino.framework.Startup;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -14,6 +17,13 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 public class CSDBImport implements Startup {
+
+	private FileSystem cryptoFileSystem = FileSystems.getFileSystem(CryptoFS.uri());
+	private FileSystem defaultFileSystem = FileSystems.getDefault();
+
+	// Encrypt example.
+	//new Crypto().decrypt(Files.newInputStream(path), CryptoPath.getKey(path)
+
 
 	private Consumer<Path> setScpFileReceivedHandler = (Path path) -> {
 		System.out.println("Received zip file: " + path.toString());
@@ -24,9 +34,9 @@ public class CSDBImport implements Startup {
 		}
 
 		try {
-			Path csdbPath = FileSystems.getDefault().getPath(csdbFile.getPath());
-			byte bytes[] = Files.readAllBytes(FileSystems.getDefault().getPath(Configuration.SCP.getRootDir() + path.toString()));
-			ZipInputStream zis = new ZipInputStream(new ByteArrayInputStream(bytes));
+			Path csdbPath = cryptoFileSystem.getPath(csdbFile.getPath());
+
+			ZipInputStream zis = new ZipInputStream(Files.newInputStream(path));
 			ZipEntry entry;
 
 			while ((entry = zis.getNextEntry()) != null) {
@@ -35,7 +45,10 @@ public class CSDBImport implements Startup {
 				if (!entry.isDirectory()) {
 					Path dest = csdbPath.resolve(entry.getName());
 					Files.copy(zis, dest);
-					System.out.println("CSDB file written to: " + dest.toString());
+					System.out.println("CSDB file encrypted written to: " + dest.toString());
+
+					String encryptedKey = new KeyExchange().encryptKey(CryptoPath.getKey(dest), Store.getRecipientKey());
+					Store.saveKey(entry.getName(), encryptedKey);
 				}
 			}
 		} catch (IOException e) {

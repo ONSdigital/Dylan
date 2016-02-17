@@ -15,14 +15,14 @@ import static com.github.davidcarboni.dylan.Configuration.getEndpoint;
  */
 public class Notify {
 
-    public static final String RECIPIENT_NOTIFY_PATH = "notify";
+    public static final String RECIPIENT_NOTIFY_PATH = "csdbnotify";
     public static final Endpoint endpoint = getEndpoint(RECIPIENT_HOST, RECIPIENT_NOTIFY_PATH);
 
     public static boolean notify(String name) throws IOException {
         boolean result = false;
 
         try (Http http = new Http()) {
-            Response<String> response = http.getJson(endpoint.setParameter("name", name), String.class);
+            Response<String> response = http.postJson(endpoint,  name, String.class);
             StatusLine statusLine = response.statusLine;
             if (statusLine.getStatusCode() == 200) {
                 result = true;
