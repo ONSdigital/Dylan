@@ -10,11 +10,7 @@ import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.FileSystem;
-import java.nio.file.FileSystems;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.UUID;
+import java.nio.file.*;
 import java.util.function.Consumer;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -43,10 +39,10 @@ public class CSDBImport implements Startup {
 				if (!entry.isDirectory()) {
 					Path dest = resolveFile(csdbPath, entry.getName());
 
-					Files.copy(zis, dest);
+					Files.copy(zis, dest, StandardCopyOption.REPLACE_EXISTING);
 
 					String encryptedKey = new KeyExchange().encryptKey(CryptoPath.getKey(dest), Store.getRecipientKey());
-					Store.saveKey(keyName(dest), encryptedKey);
+					Store.saveKey(entry.getName(), encryptedKey);
 
 					Notifier.notify(dest);
 				}
@@ -65,9 +61,7 @@ public class CSDBImport implements Startup {
 	};
 
 	private Path resolveFile(Path path, String name) {
-		// TODO REMOVE the UUID from the name - this is for local dev only. Allows us to upload the same file multiple times.
-		return path.resolve(String.format("%s-%s.%s", FilenameUtils.getBaseName(name), UUID.randomUUID(),
-				FilenameUtils.getExtension(name)));
+		return path.resolve(name);
 	}
 
 	private String keyName(Path p) {
