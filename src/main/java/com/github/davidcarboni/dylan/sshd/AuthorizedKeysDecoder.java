@@ -3,6 +3,7 @@ package com.github.davidcarboni.dylan.sshd;
 import org.apache.commons.codec.binary.Base64;
 
 import java.io.File;
+import java.io.InputStream;
 import java.math.BigInteger;
 import java.security.KeyFactory;
 import java.security.PublicKey;
@@ -40,17 +41,32 @@ public class AuthorizedKeysDecoder implements PublicKeyAuthenticator {
 	}
 
 	public AuthorizedKeysDecoder(String authorizedKeys) {
+		System.out.println("Authorized keys file: " + authorizedKeys);
 		try {
 			File file = new File(authorizedKeys);
 			Scanner scanner = new Scanner(file).useDelimiter("\n");
-			while (scanner.hasNext()) {
-				PublicKey key = this.decodePublicKey(scanner.next());
-				publicKeys.add(key);
-			}
-			scanner.close();
+			readFromScanner(scanner);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+
+	public AuthorizedKeysDecoder(InputStream authorizedKeys) {
+		System.out.println("Authorized keys file: from stream");
+		try {
+			Scanner scanner = new Scanner(authorizedKeys).useDelimiter("\n");
+			readFromScanner(scanner);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	private void readFromScanner(Scanner scanner) throws Exception {
+		while (scanner.hasNext()) {
+			PublicKey key = this.decodePublicKey(scanner.next());
+			publicKeys.add(key);
+		}
+		scanner.close();
 	}
 
 	private PublicKey decodePublicKey(String keyLine) throws Exception {
