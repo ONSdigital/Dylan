@@ -5,7 +5,6 @@ WORKDIR /usr/src
 ADD git_commit_id /usr/src/
 ADD ./target/dependency /usr/src/target/dependency
 ADD ./target/classes /usr/src/target/classes
-ADD ./target/web /usr/src/target/web
 #ADD ./target/*-jar-with-dependencies.jar /usr/src/target/
 
 
