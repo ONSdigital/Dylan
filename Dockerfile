@@ -3,12 +3,19 @@ FROM onsdigital/java-component
 # Add the build artifacts
 WORKDIR /usr/src
 ADD git_commit_id /usr/src/
-ADD ./target/*-jar-with-dependencies.jar /usr/src/target/
+ADD ./target/dependency /usr/src/target/dependency
+ADD ./target/classes /usr/src/target/classes
+ADD ./target/web /usr/src/target/web
+#ADD ./target/*-jar-with-dependencies.jar /usr/src/target/
+
 
 # SSH port
-EXPOSE 2323
+EXPOSE 2222
 
 # Set the entry point
-ENTRYPOINT java -Xmx4094m \
-          -Drestolino.packageprefix=com.github.davidcarboni.dylan.api \
-          -jar target/*-jar-with-dependencies.jar
+ENTRYPOINT java -Xmx2048m \
+   -Drestolino.files=target/web \
+   -Drestolino.classes=target/classes \
+   -Drestolino.packageprefix=com.github.davidcarboni.dylan.api \
+   -cp "target/classes:target/dependency/*" \
+   com.github.davidcarboni.restolino.Main
