@@ -35,7 +35,7 @@ public class CryptoFSFactory implements FileSystemFactory {
         URI uri = path.toUri();
         System.out.println("uri = " + uri);
        // Path path2 = fileSystem.getPath("/home/david");
-        Path path2 = fileSystem.getPath(getCsdbDataDir());
+        Path path2 = fileSystem.getPath(getCsdbDataDir().toString());
         URI uri2 = path2.toUri();
         System.out.println("uri = " + uri2);
     }

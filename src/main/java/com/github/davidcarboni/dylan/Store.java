@@ -2,7 +2,6 @@ package com.github.davidcarboni.dylan;
 
 import com.github.davidcarboni.cryptolite.KeyWrapper;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.StringUtils;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
@@ -11,7 +10,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.security.PublicKey;
 import java.util.ArrayList;
@@ -24,11 +22,10 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  */
 public class Store {
 
-	static final Path store = Paths.get(StringUtils.defaultIfBlank(System.getenv("dylan.storage"), "./target/dylan"));
-	public static final Path keys = store.resolve("keys");
-	public static final Path files = store.resolve("files");
-	static final Path senderKey = store.resolve("sender.pub");
-	static final Path recipientKey = store.resolve("recipient.pub");
+	public static final Path keys = Configuration.CSDB.getCsdbKeyDir();
+	public static final Path files = Configuration.CSDB.getCsdbDataDir();
+	static final Path senderKey = Configuration.CSDB.getBaseDir().resolve("sender.pub");
+	static final Path recipientKey = Configuration.CSDB.getBaseDir().resolve("recipient.pub");
 
 	static boolean initialised;
 
