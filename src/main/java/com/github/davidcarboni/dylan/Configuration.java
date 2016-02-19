@@ -4,6 +4,8 @@ import com.github.davidcarboni.httpino.Endpoint;
 import com.github.davidcarboni.httpino.Host;
 import org.apache.commons.lang3.StringUtils;
 
+import java.nio.file.Paths;
+
 
 public class Configuration {
 
@@ -48,11 +50,15 @@ public class Configuration {
 		private static final String CSDB_DATA_DIR_ENV = "CSDB_DATA_DIR";
 
 		public static String getCsdbDataDir() {
-			return get(CSDB_DATA_DIR_ENV, System.getProperty("user.dir") + "/target/files");
+			return Paths.get(getBaseDir(), "files").toString();
 		}
 
 		public static String getCsdbKeyDir() {
-			return get(CSDB_DATA_DIR_ENV, System.getProperty("user.dir") + "/target/keys");
+			return Paths.get(getBaseDir(), "keys").toString();
+		}
+
+		private static String getBaseDir() {
+			return get(CSDB_DATA_DIR_ENV, System.getProperty("user.dir") + "/target");
 		}
 	}
 
