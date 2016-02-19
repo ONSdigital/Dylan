@@ -5,6 +5,9 @@ WORKDIR /usr/src
 ADD git_commit_id /usr/src/
 ADD ./target/*-jar-with-dependencies.jar /usr/src/target/
 
+# SSH port
+EXPOSE 2323
+
 # Set the entry point
 ENTRYPOINT java -Xmx4094m \
           -Drestolino.packageprefix=com.github.davidcarboni.dylan.api \
