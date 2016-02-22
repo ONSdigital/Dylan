@@ -36,7 +36,7 @@ public class SSHServer {
 
 		this.scpFileReceivedHandler = scpFileReceivedHandler;
 		this.scpRootDir = Configuration.SCP.getRootDir();
-		this.publicKeyAuthenticator = new AuthorizedKeysDecoder(getClass().getResourceAsStream("/authorized_keys"));
+        this.publicKeyAuthenticator = new AuthorizedKeysDecoder(Configuration.SCP.getAuthorizedKeys());
 	}
 
 	public void start() throws IOException {
