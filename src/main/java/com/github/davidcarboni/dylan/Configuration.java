@@ -10,11 +10,16 @@ import java.nio.file.Paths;
 
 public class Configuration {
 
-	public static final String ZEBEDEE_HOST_STR = StringUtils.defaultIfBlank(System.getenv("recipient.url"), "http://localhost:8082");
+	public static class Recipient {
 
-	public static final Host RECIPIENT_HOST = new Host(ZEBEDEE_HOST_STR);
+		public static final String RECIPIENT_HOST_STR = StringUtils.defaultIfBlank(System.getenv("recipient.url"), "http://localhost:8082");
 
-	public static final String RECIPIENT_NOTIFY_PATH = "csdbnotify";
+		public static final Host RECIPIENT_HOST = new Host(RECIPIENT_HOST_STR);
+
+		public static final String RECIPIENT_NOTIFY_PATH = "csdbnotify";
+
+		public static final String RECIPIENT_KEY_PATH = "csdbkey";
+	}
 
 	public static Endpoint getEndpoint(Host host, String path) {
 		return new Endpoint(host, path);

@@ -81,7 +81,7 @@ public class CSDBImport implements Startup {
 	private void processFile(Path csdbPath, InputStream inputStream, String filename) throws IOException {
 		Path destinationPath = resolveFile(csdbPath, filename);
 		Files.copy(inputStream, destinationPath, StandardCopyOption.REPLACE_EXISTING);
-		String encryptedKey = new KeyExchange().encryptKey(CryptoPath.getKey(destinationPath), Store.getRecipientKey());
+		String encryptedKey = new KeyExchange().encryptKey(CryptoPath.getKey(destinationPath), Store.getRecipientKey().get());
 		Store.saveKey(filename, encryptedKey);
 		Notifier.notify(destinationPath);
 	}

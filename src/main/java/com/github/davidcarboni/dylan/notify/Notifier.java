@@ -9,8 +9,8 @@ import org.apache.http.StatusLine;
 import java.io.IOException;
 import java.nio.file.Path;
 
-import static com.github.davidcarboni.dylan.Configuration.RECIPIENT_HOST;
-import static com.github.davidcarboni.dylan.Configuration.RECIPIENT_NOTIFY_PATH;
+import static com.github.davidcarboni.dylan.Configuration.Recipient.RECIPIENT_HOST;
+import static com.github.davidcarboni.dylan.Configuration.Recipient.RECIPIENT_NOTIFY_PATH;
 import static com.github.davidcarboni.dylan.Configuration.getEndpoint;
 
 /**

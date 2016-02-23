@@ -14,6 +14,7 @@ import java.nio.file.StandardCopyOption;
 import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
@@ -76,12 +77,12 @@ public class Store {
 		return result;
 	}
 
-	public static PublicKey getRecipientKey() throws IOException {
+	public static Optional<PublicKey> getRecipientKey() throws IOException {
 		initialise();
-		PublicKey result = null;
+		Optional<PublicKey> result = Optional.empty();
 		if (Files.isRegularFile(recipientKey)) {
 			String encodedKey = FileUtils.readFileToString(recipientKey.toFile(), UTF_8);
-			result = KeyWrapper.decodePublicKey(encodedKey);
+			result = Optional.of(KeyWrapper.decodePublicKey(encodedKey));
 		}
 		return result;
 	}

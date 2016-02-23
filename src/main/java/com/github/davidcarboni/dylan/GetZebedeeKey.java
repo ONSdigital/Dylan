@@ -5,49 +5,69 @@ import com.github.davidcarboni.httpino.Endpoint;
 import com.github.davidcarboni.httpino.Http;
 import com.github.davidcarboni.httpino.Response;
 import com.github.davidcarboni.restolino.framework.Startup;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
 
 import java.io.IOException;
 import java.security.PublicKey;
-import java.util.Optional;
 
-import static com.github.davidcarboni.dylan.Configuration.RECIPIENT_HOST;
+import static com.github.davidcarboni.dylan.Configuration.Recipient.RECIPIENT_HOST;
+import static com.github.davidcarboni.dylan.Configuration.Recipient.RECIPIENT_KEY_PATH;
 import static com.github.davidcarboni.dylan.Configuration.getEndpoint;
 import static javax.ws.rs.core.Response.Status.OK;
+import static org.slf4j.LoggerFactory.getLogger;
 
 /**
  * Requests the public key from Zebedee.
  */
 public class GetZebedeeKey implements Startup {
 
-	public static final String RECIPIENT_KEY_PATH = "csdbkey";
+	private static final Logger LOG = getLogger(GetZebedeeKey.class);
 	public static final Endpoint endpoint = getEndpoint(RECIPIENT_HOST, RECIPIENT_KEY_PATH);
 
 	@Override
 	public void init() {
-		Optional<String> zebedeeKey = getKey();
-		if (zebedeeKey.isPresent()) {
-			PublicKey publicKey = KeyWrapper.decodePublicKey(zebedeeKey.get());
-			try {
+		try {
+			if (recipientKeyExists()) {
+				LOG.info("Existing recipient key found. No action further action required.");
+			} else {
+				LOG.info("No existing recipient key found on start up. Requesting a new recipient key.");
+				String recipientKeyStr = requestKeyFromRecipient();
+				PublicKey publicKey = KeyWrapper.decodePublicKey(recipientKeyStr);
 				Store.saveRecipientKey(publicKey);
-				System.out.println("Zebedee public key obtained/updated.");
-			} catch (IOException ex) {
-				ex.printStackTrace();
+				LOG.info("Successfully obtained & stored recipient key. Continuing with start up.");
 			}
-		} else {
-			// TODO RETRY
-			throw new RuntimeException("FAILED TO OBTAIN KEY.");
+		} catch (IOException e) {
+			LOG.info("Encountered an unexpected error: {}", e);
 		}
 	}
 
-	private Optional<String> getKey() {
+	/**
+	 * Check if a recipient is available.
+	 */
+	private boolean recipientKeyExists() throws IOException {
+		return Store.getRecipientKey().isPresent();
+	}
+
+	/**
+	 * Get the recipient public key from the recipient.
+	 */
+	private String requestKeyFromRecipient() throws IOException {
 		try (Http http = new Http()) {
 			Response<String> response = http.getJson(endpoint, String.class);
-			if (response.statusLine.getStatusCode() == OK.getStatusCode()) {
-				return Optional.of(response.body);
+
+			if (response.statusLine.getStatusCode() != OK.getStatusCode()) {
+				LOG.info("Failed to obtain recipient key. HTTP status code {}", response.statusLine.getStatusCode());
+				throw new RuntimeException();
 			}
-		} catch (IOException ex) {
-			ex.printStackTrace();
+			if (StringUtils.isEmpty(response.body)) {
+				LOG.info("Failed to obtain recipient key. Response body was empty");
+				throw new RuntimeException();
+			}
+			return response.body;
+		} catch (IOException e) {
+			LOG.info("Unexpected error while requesting new recipient key: {}", e);
+			throw e;
 		}
-		return Optional.empty();
 	}
 }
