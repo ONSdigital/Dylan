@@ -7,16 +7,21 @@ import com.github.davidcarboni.dylan.notify.Notifier;
 import com.github.davidcarboni.dylan.sshd.SSHServer;
 import com.github.davidcarboni.restolino.framework.Startup;
 import org.apache.commons.io.FilenameUtils;
+import org.slf4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.*;
 import java.util.function.Consumer;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import static org.slf4j.LoggerFactory.getLogger;
 
 public class CSDBImport implements Startup {
+
+	private static final Logger log = getLogger(CSDBImport.class);
 
 	private FileSystem cryptoFileSystem = FileSystems.getFileSystem(CryptoFS.uri());
 
@@ -28,25 +33,7 @@ public class CSDBImport implements Startup {
 		}
 
 		try {
-			Path csdbPath = cryptoFileSystem.getPath(csdbFile.getPath());
-
-			ZipInputStream zis = new ZipInputStream(Files.newInputStream(path));
-			ZipEntry entry;
-
-			while ((entry = zis.getNextEntry()) != null) {
-				System.out.println("Received CSDB file: " + entry.getName());
-
-				if (!entry.isDirectory()) {
-					Path dest = resolveFile(csdbPath, entry.getName());
-
-					Files.copy(zis, dest, StandardCopyOption.REPLACE_EXISTING);
-
-					String encryptedKey = new KeyExchange().encryptKey(CryptoPath.getKey(dest), Store.getRecipientKey());
-					Store.saveKey(entry.getName(), encryptedKey);
-
-					Notifier.notify(dest);
-				}
-			}
+			processFile(path, csdbFile);
 		} catch (IOException e) {
 			e.printStackTrace();
 			throw new RuntimeException(e);
@@ -60,6 +47,45 @@ public class CSDBImport implements Startup {
 		}
 	};
 
+	private void processFile(Path path, File csdbFile) throws IOException {
+		log.info("Received file: {}", path.toString());
+		Path csdbPath = cryptoFileSystem.getPath(csdbFile.getPath());
+		if (FilenameUtils.getExtension(path.toString()).equalsIgnoreCase("zip")) {
+			log.info("Processing as a zip file: {}", path.toString());
+            processZipFile(path, csdbPath);
+        } else {
+			log.info("Processing as a single file: {}", path.toString());
+            processSingleFile(path, csdbPath);
+        }
+	}
+
+	private void processSingleFile(Path path, Path csdbPath) throws IOException {
+		try(InputStream inputStream = Files.newInputStream(path)) {
+            String filename = FilenameUtils.getName(path.toString());
+			processFile(csdbPath, inputStream, filename);
+        }
+	}
+
+	private void processZipFile(Path path, Path csdbPath) throws IOException {
+		ZipInputStream zis = new ZipInputStream(Files.newInputStream(path));
+		ZipEntry entry;
+
+		while ((entry = zis.getNextEntry()) != null) {
+            log.info("Processing file from zip: {}", entry.getName());
+            if (!entry.isDirectory()) {
+				processFile(csdbPath, zis, entry.getName());
+            }
+        }
+	}
+
+	private void processFile(Path csdbPath, InputStream inputStream, String filename) throws IOException {
+		Path destinationPath = resolveFile(csdbPath, filename);
+		Files.copy(inputStream, destinationPath, StandardCopyOption.REPLACE_EXISTING);
+		String encryptedKey = new KeyExchange().encryptKey(CryptoPath.getKey(destinationPath), Store.getRecipientKey());
+		Store.saveKey(filename, encryptedKey);
+		Notifier.notify(destinationPath);
+	}
+
 	private Path resolveFile(Path path, String name) {
 		return path.resolve(name);
 	}
@@ -71,9 +97,10 @@ public class CSDBImport implements Startup {
 	@Override
 	public void init() {
 		try {
+			log.info("CSDB Import init. Starting SSH server...");
 			new SSHServer(setScpFileReceivedHandler).start();
 		} catch (IOException e) {
-			e.printStackTrace();
+			log.error("Failed to start SSH server", e);
 		}
 	}
 }

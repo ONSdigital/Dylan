@@ -1,6 +1,9 @@
 package com.github.davidcarboni.dylan.sshd;
 
+import com.github.davidcarboni.dylan.CSDBImport;
 import org.apache.commons.codec.binary.Base64;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.InputStream;
@@ -17,6 +20,7 @@ import static com.github.davidcarboni.dylan.Configuration.SCP.getAuthorizedKeys;
 // https://stackoverflow.com/questions/3531506/using-public-key-from-authorized-keys-with-java-security
 
 public class AuthorizedKeysDecoder implements PublicKeyAuthenticator {
+	final Logger log = LoggerFactory.getLogger(CSDBImport.class);
 
 	private static final String SSH_RSA = "ssh-rsa";
 	private static final String SSH_DSS = "ssh-dss";
@@ -41,7 +45,6 @@ public class AuthorizedKeysDecoder implements PublicKeyAuthenticator {
 	}
 
 	public AuthorizedKeysDecoder(String authorizedKeys) {
-		System.out.println("Authorized keys file: " + authorizedKeys);
 		try {
 			File file = new File(authorizedKeys);
 			Scanner scanner = new Scanner(file).useDelimiter("\n");

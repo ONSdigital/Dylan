@@ -1,6 +1,7 @@
 package com.github.davidcarboni.dylan.filesystem;
 
 import com.github.davidcarboni.cryptolite.Keys;
+import org.slf4j.Logger;
 
 import javax.crypto.SecretKey;
 import java.io.File;
@@ -12,10 +13,11 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-/**
- * TODO: implement.
- */
+import static org.slf4j.LoggerFactory.getLogger;
+
 public class CryptoPath implements Path {
+
+    private static final Logger log = getLogger(CryptoPath.class);
 
     private static Map<Path, SecretKey> keys = new ConcurrentHashMap<>();
 
@@ -42,9 +44,9 @@ public class CryptoPath implements Path {
         // Attempt to ensure we have a canonical path:
         SecretKey current = keys.putIfAbsent(this, Keys.newSecretKey());
         if (current == null)
-            System.out.println("Generated a key for " + this.toUri());
+            log.info("Generated a key for {}", this.toUri());
         else
-            System.out.println("Using existing key for " + this.toUri());
+            log.info("Using existing key for {}", this.toUri());
     }
 
     public static SecretKey getKey(Path path) {
@@ -207,9 +209,9 @@ public class CryptoPath implements Path {
     @Override
     public boolean equals(Object o) {
         try {
-            return o!=null &&
+            return o != null &&
                     CryptoPath.class.isAssignableFrom(o.getClass()) &&
-                    Files.isSameFile(path, ((CryptoPath)o).path);
+                    Files.isSameFile(path, ((CryptoPath) o).path);
         } catch (IOException e) {
             e.printStackTrace();
             return false;
