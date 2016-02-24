@@ -1,6 +1,7 @@
 package com.github.davidcarboni.dylan;
 
 import com.github.davidcarboni.cryptolite.KeyExchange;
+import com.github.davidcarboni.dylan.api.HttpSupplier;
 import com.github.davidcarboni.dylan.filesystem.CryptoFS;
 import com.github.davidcarboni.dylan.filesystem.CryptoPath;
 import com.github.davidcarboni.dylan.notify.Notifier;
@@ -12,7 +13,11 @@ import org.slf4j.Logger;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.*;
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.function.Consumer;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -24,6 +29,7 @@ public class CSDBImport implements Startup {
 	private static final Logger log = getLogger(CSDBImport.class);
 
 	private FileSystem cryptoFileSystem = FileSystems.getFileSystem(CryptoFS.uri());
+	private HttpSupplier httpSupplier = new HttpSupplier();
 
 	private Consumer<Path> setScpFileReceivedHandler = (Path path) -> {
 		File csdbFile = new File(Store.files.toString());
@@ -83,7 +89,7 @@ public class CSDBImport implements Startup {
 		Files.copy(inputStream, destinationPath, StandardCopyOption.REPLACE_EXISTING);
 		String encryptedKey = new KeyExchange().encryptKey(CryptoPath.getKey(destinationPath), Store.getRecipientKey().get());
 		Store.saveKey(filename, encryptedKey);
-		Notifier.notify(destinationPath);
+		Notifier.notify(CryptoPath.unwrap(destinationPath), httpSupplier);
 	}
 
 	private Path resolveFile(Path path, String name) {
