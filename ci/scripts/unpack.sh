@@ -1,3 +1,3 @@
 #!/bin/bash -eux
 
-tar zxfv build-bundle/*.tar.gz -C build && cp build/*.jar target/
+tar zxfv build-bundle/*.tar.gz -C build && cp -r build/* target/
