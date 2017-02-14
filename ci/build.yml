@@ -1,0 +1,17 @@
+---
+
+platform: linux
+
+image_resource:
+  type: docker-image
+  source:
+    repository: maven
+
+inputs:
+  - name: dylan
+
+outputs:
+  - name: target
+
+run:
+  path: dylan/ci/scripts/build.sh
