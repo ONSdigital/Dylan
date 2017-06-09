@@ -1,0 +1,15 @@
+FROM onsdigital/java-component
+
+WORKDIR /usr/src
+
+ADD dependency target/dependency
+ADD classes target/classes
+
+# SSH port
+EXPOSE 2222
+
+CMD java -Xmx2048m -cp "target/classes:target/dependency/*"     \
+    -Drestolino.packageprefix=com.github.davidcarboni.dylan.api \
+    -Drestolino.files=target/web       \
+    -Drestolino.classes=target/classes \
+    com.github.davidcarboni.restolino.Main
