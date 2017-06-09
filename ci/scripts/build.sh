@@ -2,5 +2,5 @@
 
 pushd dylan
   mvn -DskipTests=true clean package dependency:copy-dependencies
-  cp Dockerfile.concourse target/* ../build/
+  cp -r Dockerfile.concourse target/* ../build/
 popd
