@@ -9,7 +9,7 @@ job "dylan" {
   }
 
   group "publishing" {
-    count = 1
+    count = "{{PUBLISHING_TASK_COUNT}}"
 
     constraint {
       attribute = "${node.class}"
@@ -50,8 +50,8 @@ job "dylan" {
       }
 
       resources {
-        cpu    = 1000
-        memory = 2048
+        cpu    = "{{PUBLISHING_RESOURCE_CPU}}"
+        memory = "{{PUBLISHING_RESOURCE_MEM}}"
 
         network {
           port "http" {}
